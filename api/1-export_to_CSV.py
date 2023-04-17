@@ -1,25 +1,22 @@
 #!/usr/bin/python3
-""" Place Holder """
+'''
+A script to export data in the CSV format.
+'''
 
+import csv
+import requests
+from sys import argv
 
-if __name__ == "__main__":
-
-    import csv
-    import requests
-    from sys import argv
-
-    if len(argv) < 2:
-        exit()
-    todos = requests.get(
-        "https://jsonplaceholder.typicode.com/todos?userId={}"
-        .format(argv[1]))
-    name = requests.get(
-        "https://jsonplaceholder.typicode.com/users?id={}".format(argv[1]))
-    name = name.json()
-    name = name[0]["username"]
-    todos = todos.json()
-    file_name = "{}.csv".format(argv[1])
-    with open(file_name, 'w') as csv_file:
-        writer = csv.writer(csv_file, delimiter=',', quoting=csv.QUOTE_ALL)
-        for todo in todos:
-            writer.writerow([argv[1], name, todo['completed'], todo['title']])
+if __name__ == '__main__':
+    uid = argv[1]
+    url = "https://jsonplaceholder.typicode.com/users/{}".format(uid)
+    user = requests.get(url, verify=False).json()
+    url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(
+        uid)
+    todo = requests.get(url, verify=False).json()
+    with open("{}.csv".format(uid), 'w', newline='') as csvfile:
+        taskwriter = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+        for t in todo:
+            taskwriter.writerow([int(uid), user.get('username'),
+                                 t.get('completed'),
+                                 t.get('title')])
